@@ -1,0 +1,14 @@
+name: zerospeech-vae
+channels:
+  - pytorch
+  - defaults
+dependencies:
+  - python=3.6
+  - pytorch
+  - torchvision
+  - numpy
+  - h5py=2.*
+  - pip:
+    - git+https://github.com/bootphon/h5features.git
+#    - git+https://github.com/Rachine/DTW_Cython.git
+#    - git+https://github.com/bootphon/spectral.git
