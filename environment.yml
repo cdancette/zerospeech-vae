@@ -4,7 +4,7 @@ channels:
   - defaults
 dependencies:
   - python=3.6
-  - pytorch
+  - pytorch=0.4
   - torchvision
   - numpy
   - h5py=2.*
