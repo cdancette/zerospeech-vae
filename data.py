@@ -4,6 +4,7 @@ import random
 import numpy as np
 import torch
 import torch.utils.data 
+
 class FeaturesDataset(torch.utils.data.Dataset):
 	def __init__(self, features):
 		super(FeaturesDataset, self).__init__()
