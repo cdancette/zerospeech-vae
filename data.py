@@ -27,8 +27,6 @@ def get_train_test_datasets(h5feature_path, train_ratio):
 	random.shuffle(files)
 	train_idx = int(len(files) * train_ratio)
 
-	print(train_idx)
-	print(len(files))
 	train_dataset = np.vstack(dict_features[f] for f in files[:train_idx])
 	test_dataset = np.vstack(dict_features[f] for f in files[train_idx:])
 	return FeaturesDataset(train_dataset), FeaturesDataset(test_dataset)
