@@ -65,6 +65,7 @@ if __name__=='__main__':
 		dict_labels = data.dict_labels()
 		#print(dict_labels)
 		for file in dict_features:
+			print("Processing {}".format(file))
 			inputs = dict_features[file]
 			inputs = torch.FloatTensor(inputs)
 			inputs = inputs.to(device)
