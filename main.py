@@ -16,7 +16,7 @@ import numpy as np
 
 from model import VAE
 from data import get_train_test_datasets
-
+from pathlib import Path
 
 # Reconstruction + KL divergence losses summed over all elements and batch
 def loss_function(recon_x, x, mu, logvar):
@@ -73,6 +73,7 @@ if __name__=='__main__':
 	parser.add_argument('-s', '--embedding-size', required=True, type=int)
 	parser.add_argument('--batch-size', type=int, default=64, metavar='N',
 	                    help='input batch size for training (default: 128)')
+	parser.add_argument('-m', '--model-path', help="path to save model", required=True)
 	parser.add_argument('--epochs', type=int, default=50, metavar='N',
 	                    help='number of epochs to train (default: 10)')
 	parser.add_argument('--no-cuda', action='store_true', default=False,
@@ -81,9 +82,12 @@ if __name__=='__main__':
 	                    help='random seed (default: 1)')
 	parser.add_argument('--log-interval', type=int, default=1000, metavar='N',
 	                    help='how many batches to wait before logging training status')
-	
+
 	args = parser.parse_args()
 	args.cuda = not args.no_cuda and torch.cuda.is_available()
+
+	model_path = Path(args.model_path)
+	model_path.mkdir(exist_ok=True, parents=True)
 
 	torch.manual_seed(args.seed)
 
@@ -101,7 +105,7 @@ if __name__=='__main__':
 	for epoch in range(1, args.epochs + 1):
 		train(epoch)
 		test(epoch)
-		torch.save(model.state_dict(), "model/model-%s.pt" % epoch)
+		torch.save(model.state_dict(), model_path / ("model-%s.pt" % epoch))
 		#with torch.no_grad():
 		#    sample = torch.randn(64, args.embedding_size).to(device)
 		#    sample = model.decode(sample).cpu()
