@@ -31,7 +31,7 @@ if __name__=='__main__':
 	parser.add_argument('-p', '--model-path', required=True)
 	parser.add_argument('-s', '--embedding-size', required=True, type=int)
 	parser.add_argument('-o', '--output-embeddings', required=True)
-	parser.add_argument('--h5', help="store h5 features", action="store_true")
+	parser.add_argument('--csv', help="store csv", action="store_true")
 
 	parser.add_argument('--batch-size', type=int, default=64, metavar='N',
 	                    help='input batch size for training (default: 128)')
@@ -57,11 +57,11 @@ if __name__=='__main__':
 	#dataset = get_dataset(args.features_path)
 	#data_loader = torch.utils.data.DataLoader(dataset, batch_size=args.batch_size)
 
-	if args.h5:
-		writer = h5features.Writer(args.output_embeddings)
-	else:
+	if args.csv:
 		output_dir = Path(args.output_embeddings)
 		output_dir.mkdir(exist_ok=True)
+	else:
+		writer = h5features.Writer(args.output_embeddings)
 
 		
 	model = VAE(input_size=40, num_components=args.embedding_size).to(device)
@@ -79,15 +79,15 @@ if __name__=='__main__':
 			inputs = inputs.to(device)
 			mu, logvar = model.encode(inputs.view(-1, 40))
 			z = model.reparameterize(mu, logvar).cpu().numpy()
-			if args.h5:
-				data = h5features.Data(items=[file], labels=[dict_labels[file]], features=[z], check=True)
-				writer.write(data, 'features', append=True)
-			else:	
+			if args.csv:	
 				with open(output_dir / '{file}.fea'.format(file=file), "w") as f:
 					for i, line in enumerate(z):
 						f.write("{time} {feat}\n".format(time=dict_labels[file][i], feat=" ".join(str(l) for l in line)))
+			else:
+				data = h5features.Data(items=[file], labels=[dict_labels[file]], features=[z], check=True)
+				writer.write(data, 'features', append=True)
 
-	if args.h5:
+	if not args.csv:
 		writer.close()
 
 	#embed(args.output_embeddings)
