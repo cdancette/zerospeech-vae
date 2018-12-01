@@ -69,7 +69,7 @@ if __name__=='__main__':
 			inputs = torch.FloatTensor(inputs)
 			inputs = inputs.to(device)
 			mu, logvar = model.encode(inputs.view(-1, 40))
-			z = model.reparameterize(mu, logvar).numpy()
+			z = model.reparameterize(mu, logvar).cpu().numpy()
 			with open(output_dir / '{file}.fea'.format(file=file), "w") as f:
 				for i, line in enumerate(z):
 					f.write("{time} {feat}\n".format(time=dict_labels[file][i], feat=" ".join(str(l) for l in line)))
