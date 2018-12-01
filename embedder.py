@@ -31,6 +31,7 @@ if __name__=='__main__':
 	parser.add_argument('-p', '--model-path', required=True)
 	parser.add_argument('-s', '--embedding-size', required=True, type=int)
 	parser.add_argument('-o', '--output-embeddings', required=True)
+	parser.add_argument('--h5', help="store h5 features", action="store_true")
 
 	parser.add_argument('--batch-size', type=int, default=64, metavar='N',
 	                    help='input batch size for training (default: 128)')
@@ -55,6 +56,13 @@ if __name__=='__main__':
 
 	#dataset = get_dataset(args.features_path)
 	#data_loader = torch.utils.data.DataLoader(dataset, batch_size=args.batch_size)
+
+	if args.h5:
+		writer = h5features.Writer(args.output_embeddings)
+	else:
+		output_dir = Path(args.output_embeddings)
+		output_dir.mkdir(exist_ok=True)
+
 		
 	model = VAE(input_size=40, num_components=args.embedding_size).to(device)
 	model.load_state_dict(torch.load(args.model_path))
@@ -63,7 +71,7 @@ if __name__=='__main__':
 		data = h5features.reader.Reader(args.features_path).read()
 		dict_features = data.dict_features()
 		dict_labels = data.dict_labels()
-		#print(dict_labels)
+		
 		for file in dict_features:
 			print("Processing {}".format(file))
 			inputs = dict_features[file]
@@ -71,9 +79,16 @@ if __name__=='__main__':
 			inputs = inputs.to(device)
 			mu, logvar = model.encode(inputs.view(-1, 40))
 			z = model.reparameterize(mu, logvar).cpu().numpy()
-			with open(output_dir / '{file}.fea'.format(file=file), "w") as f:
-				for i, line in enumerate(z):
-					f.write("{time} {feat}\n".format(time=dict_labels[file][i], feat=" ".join(str(l) for l in line)))
+			if args.h5:
+				data = h5features.Data(items=[file], labels=[dict_labels[file]], features=[z], check=True)
+				writer.write(data, 'features', append=True)
+			else:	
+				with open(output_dir / '{file}.fea'.format(file=file), "w") as f:
+					for i, line in enumerate(z):
+						f.write("{time} {feat}\n".format(time=dict_labels[file][i], feat=" ".join(str(l) for l in line)))
+
+	if args.h5:
+		writer.close()
 
 	#embed(args.output_embeddings)
 
