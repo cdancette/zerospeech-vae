@@ -61,6 +61,7 @@ if __name__=='__main__':
 		output_dir = Path(args.output_embeddings)
 		output_dir.mkdir(exist_ok=True)
 	else:
+		output_dir = Path(args.output_embeddings).parent.mkdir(parents=True, exist_ok=True)
 		writer = h5features.Writer(args.output_embeddings)
 
 		
