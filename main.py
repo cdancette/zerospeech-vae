@@ -23,7 +23,7 @@ def loss_function(recon_x, x, mu, logvar):
     #BCE = F.binary_cross_entropy(recon_x, x.view(-1, 40), reduction='sum')
 
     # MSE norm
-    MSE = F.mse_loss(recon_x, x.view(-1, 40), reduction='sum')
+    MSE = F.mse_loss(recon_x, x.view(-1, 40))
     # see Appendix B from VAE paper:
     # Kingma and Welling. Auto-Encoding Variational Bayes. ICLR, 2014
     # https://arxiv.org/abs/1312.6114
