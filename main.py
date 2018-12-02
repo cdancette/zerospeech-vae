@@ -84,6 +84,9 @@ if __name__=='__main__':
 	                    help='random seed (default: 1)')
 	parser.add_argument('--log-interval', type=int, default=1000, metavar='N',
 	                    help='how many batches to wait before logging training status')
+	parser.add_argument('--learning-rate', type=float, default=1e-3,
+	                    help='learning rate')
+
 
 	args = parser.parse_args()
 	args.cuda = not args.no_cuda and torch.cuda.is_available()
@@ -103,7 +106,7 @@ if __name__=='__main__':
 	test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch_size, shuffle=True)
 
 	model = VAE(input_size=40, num_components=args.embedding_size).to(device)
-	optimizer = optim.Adam(model.parameters(), lr=1e-3)
+	optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
 	for epoch in range(1, args.epochs + 1):
 		train(epoch)
 		test(epoch)
