@@ -31,6 +31,7 @@ if __name__=='__main__':
 	parser.add_argument('-p', '--model-path', required=True)
 	parser.add_argument('-s', '--embedding-size', required=True, type=int)
 	parser.add_argument('-o', '--output-embeddings', required=True)
+	parser.add_argument('--input-size', type=int, default=40)
 	parser.add_argument('--csv', help="store csv", action="store_true")
 
 	parser.add_argument('--batch-size', type=int, default=64, metavar='N',
@@ -65,7 +66,7 @@ if __name__=='__main__':
 		writer = h5features.Writer(args.output_embeddings)
 
 		
-	model = VAE(input_size=40, num_components=args.embedding_size).to(device)
+	model = VAE(input_size=args.input_size, num_components=args.embedding_size).to(device)
 	model.load_state_dict(torch.load(args.model_path))
 	model.eval()
 	with torch.no_grad():
