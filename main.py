@@ -119,7 +119,7 @@ if __name__=='__main__':
     model = VAE(input_size=args.input_size, 
             num_components=args.embedding_size, 
             sigmoid=sigmoid,
-            hidden_layers=args.num_hidden_mayers,
+            hidden_layers=args.num_hidden_layers,
             ).to(device)
     optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
 
