@@ -69,47 +69,47 @@ def test(epoch):
 
 if __name__=='__main__':
 
-	parser = argparse.ArgumentParser(description='VAE MNIST Example')
+    parser = argparse.ArgumentParser(description='VAE MNIST Example')
 
-	parser.add_argument('-f', '--features-path', required=True)
-	parser.add_argument('-s', '--embedding-size', required=True, type=int)
-	parser.add_argument('--batch-size', type=int, default=64, metavar='N',
-	                    help='input batch size for training (default: 128)')
-	parser.add_argument('-m', '--model-path', help="path to save model", required=True)
-	parser.add_argument('--epochs', type=int, default=50, metavar='N',
-	                    help='number of epochs to train (default: 10)')
-	parser.add_argument('--no-cuda', action='store_true', default=False,
-	                    help='enables CUDA training')
-	parser.add_argument('--seed', type=int, default=1, metavar='S',
-	                    help='random seed (default: 1)')
+    parser.add_argument('-f', '--features-path', required=True)
+    parser.add_argument('-s', '--embedding-size', required=True, type=int)
+    parser.add_argument('--batch-size', type=int, default=64, metavar='N',
+                        help='input batch size for training (default: 128)')
+    parser.add_argument('-m', '--model-path', help="path to save model", required=True)
+    parser.add_argument('--epochs', type=int, default=50, metavar='N',
+                        help='number of epochs to train (default: 10)')
+    parser.add_argument('--no-cuda', action='store_true', default=False,
+                        help='enables CUDA training')
+    parser.add_argument('--seed', type=int, default=1, metavar='S',
+                        help='random seed (default: 1)')
     parser.add_argument('--log-interval', type=int, default=1000, metavar='N',
-	                    help='how many batches to wait before logging training status')
+                        help='how many batches to wait before logging training status')
     parser.add_argument('--learning-rate', type=float, default=1e-4, help='learning rate')
     parser.add_argument('--input-size', type=int, default=40)
 
-	args = parser.parse_args()
-	args.cuda = not args.no_cuda and torch.cuda.is_available()
+    args = parser.parse_args()
+    args.cuda = not args.no_cuda and torch.cuda.is_available()
 
-	model_path = Path(args.model_path)
-	model_path.mkdir(exist_ok=True, parents=True)
+    model_path = Path(args.model_path)
+    model_path.mkdir(exist_ok=True, parents=True)
 
-	torch.manual_seed(args.seed)
+    torch.manual_seed(args.seed)
 
-	device = torch.device("cuda" if args.cuda else "cpu")
+    device = torch.device("cuda" if args.cuda else "cpu")
 
-	kwargs = {'num_workers': 1, 'pin_memory': True} if args.cuda else {}
+    kwargs = {'num_workers': 1, 'pin_memory': True} if args.cuda else {}
 
-	train_dataset, test_dataset = get_train_test_datasets(args.features_path, 0.7)
+    train_dataset, test_dataset = get_train_test_datasets(args.features_path, 0.7)
 
-	train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
-	test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch_size, shuffle=True)
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch_size, shuffle=True)
 
-	model = VAE(input_size=args.input_size, num_components=args.embedding_size).to(device)
-	optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
-	for epoch in range(1, args.epochs + 1):
-		train(epoch)
-		test(epoch)
-		torch.save(model.state_dict(), model_path / ("model-%s.pt" % epoch))
-		#with torch.no_grad():
-		#    sample = torch.randn(64, args.embedding_size).to(device)
-		#    sample = model.decode(sample).cpu()
+    model = VAE(input_size=args.input_size, num_components=args.embedding_size).to(device)
+    optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
+    for epoch in range(1, args.epochs + 1):
+        train(epoch)
+        test(epoch)
+        torch.save(model.state_dict(), model_path / ("model-%s.pt" % epoch))
+        #with torch.no_grad():
+        #    sample = torch.randn(64, args.embedding_size).to(device)
+        #    sample = model.decode(sample).cpu()
