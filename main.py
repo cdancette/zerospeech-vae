@@ -19,7 +19,7 @@ from data import get_train_test_datasets
 from pathlib import Path
 
 def bce_loss(recon_x, x, mu, logvar, input_size=40):
-    BCE = loss = F.binary_cross_entropy(recon_x, x.view(-1, input_size), reduction='sum')
+    BCE  = F.binary_cross_entropy(recon_x, x.view(-1, input_size), reduction='sum')
     KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
     return BCE + KLD
 
