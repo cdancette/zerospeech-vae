@@ -18,12 +18,14 @@ from model import VAE
 from data import get_train_test_datasets
 from pathlib import Path
 
-# Reconstruction + KL divergence losses summed over all elements and batch
-def loss_function(recon_x, x, mu, logvar, input_size=40):
-    #BCE = F.binary_cross_entropy(recon_x, x.view(-1, input_size), reduction='sum')
+def bce_loss(recon_x, x, mu, logvar, input_size=40):
+    BCE = loss = F.binary_cross_entropy(recon_x, x.view(-1, input_size), reduction='sum')
+    KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
+    return BCE + KLD
 
-    # MSE norm
-    MSE = F.mse_loss(recon_x, x.view(-1, input_size))
+def mse_loss(recon_x, x, mu, logvar, input_size=40):
+    # Reconstruction + KL divergence losses summed over all elements and batch
+    MSE = F.mse_loss(recon_x, x.view(-1, input_size), reduction='sum')
     # see Appendix B from VAE paper:
     # Kingma and Welling. Auto-Encoding Variational Bayes. ICLR, 2014
     # https://arxiv.org/abs/1312.6114
@@ -33,7 +35,7 @@ def loss_function(recon_x, x, mu, logvar, input_size=40):
     return MSE + KLD
 
 
-def train(epoch, input_size):
+def train(epoch, input_size, loss_function=bce_loss):
     model.train()
     train_loss = 0
     for batch_idx, data in enumerate(train_loader):
@@ -54,7 +56,7 @@ def train(epoch, input_size):
           epoch, train_loss / len(train_loader.dataset)))
 
 
-def test(epoch, input_size):
+def test(epoch, input_size, loss_function=bce_loss):
     model.eval()
     test_loss = 0
     with torch.no_grad():
@@ -86,6 +88,7 @@ if __name__=='__main__':
                         help='how many batches to wait before logging training status')
     parser.add_argument('--learning-rate', type=float, default=1e-4, help='learning rate')
     parser.add_argument('--input-size', type=int, default=40)
+    parser.add_argument("--loss", choices=["bce", "mse"], default="bce")
 
     args = parser.parse_args()
     args.cuda = not args.no_cuda and torch.cuda.is_available()
@@ -106,10 +109,14 @@ if __name__=='__main__':
 
     model = VAE(input_size=args.input_size, num_components=args.embedding_size).to(device)
     optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
+
+
+    if args.loss == "bce":
+        loss_function = bce_loss
+    elif args.loss == "mce":
+        loss_function = mse_loss
+
     for epoch in range(1, args.epochs + 1):
-        train(epoch, args.input_size)
-        test(epoch, args.input_size)
+        train(epoch, args.input_size, loss_function=loss_function)
+        test(epoch, args.input_size, loss_function=loss_function)
         torch.save(model.state_dict(), model_path / ("model-%s.pt" % epoch))
-        #with torch.no_grad():
-        #    sample = torch.randn(64, args.embedding_size).to(device)
-        #    sample = model.decode(sample).cpu()
