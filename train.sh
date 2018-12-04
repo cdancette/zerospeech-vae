@@ -13,6 +13,9 @@ python -u main.py --features-path data/mandarin-fbanks-training-stacked \
 	--embedding-size 100 \
 	--epochs 40 \
 	--model-path experiments/$date/model/ \
-	--learning-rate 1e-5 \
-	--input-size 280
+	--learning-rate 1e-6 \
+	--input-size 280 \
+	--loss bce \
 	| tee $logs
+
+echo "Folder : experiments/$date"
