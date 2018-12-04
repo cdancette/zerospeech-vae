@@ -33,14 +33,14 @@ def loss_function(recon_x, x, mu, logvar, input_size=40):
     return MSE + KLD
 
 
-def train(epoch):
+def train(epoch, input_size):
     model.train()
     train_loss = 0
     for batch_idx, data in enumerate(train_loader):
         data = data.to(device)
         optimizer.zero_grad()
         recon_batch, mu, logvar = model(data)
-        loss = loss_function(recon_batch, data, mu, logvar)
+        loss = loss_function(recon_batch, data, mu, logvar, input_size)
         loss.backward()
         train_loss += loss.item()
         optimizer.step()
@@ -54,14 +54,14 @@ def train(epoch):
           epoch, train_loss / len(train_loader.dataset)))
 
 
-def test(epoch):
+def test(epoch, input_size):
     model.eval()
     test_loss = 0
     with torch.no_grad():
         for i, data, in enumerate(test_loader):
             data = data.to(device)
             recon_batch, mu, logvar = model(data)
-            test_loss += loss_function(recon_batch, data, mu, logvar).item()
+            test_loss += loss_function(recon_batch, data, mu, logvar, input_size).item()
 
     test_loss /= len(test_loader.dataset)
     print('====> Test set loss: {:.4f}'.format(test_loss))
@@ -107,8 +107,8 @@ if __name__=='__main__':
     model = VAE(input_size=args.input_size, num_components=args.embedding_size).to(device)
     optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
     for epoch in range(1, args.epochs + 1):
-        train(epoch)
-        test(epoch)
+        train(epoch, args.input_size)
+        test(epoch, args.input_size)
         torch.save(model.state_dict(), model_path / ("model-%s.pt" % epoch))
         #with torch.no_grad():
         #    sample = torch.randn(64, args.embedding_size).to(device)
