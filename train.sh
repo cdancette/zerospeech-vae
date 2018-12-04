@@ -16,6 +16,7 @@ python -u main.py --features-path data/mandarin-fbanks-training-stacked \
 	--learning-rate 1e-6 \
 	--input-size 280 \
 	--loss bce \
+	--num-hidden-layers 1 \
 	| tee $logs
 
 echo "Folder : experiments/$date"

@@ -90,6 +90,7 @@ if __name__=='__main__':
     parser.add_argument('--learning-rate', type=float, default=1e-4, help='learning rate')
     parser.add_argument('--input-size', type=int, default=40)
     parser.add_argument("--loss", choices=["bce", "mse"], default="bce")
+    parser.add_argument("--num-hidden-layers", type=int, default=1)
 
     args = parser.parse_args()
     args.cuda = not args.no_cuda and torch.cuda.is_available()
@@ -115,7 +116,11 @@ if __name__=='__main__':
         loss_function = mse_loss
         sigmoid = False
     
-    model = VAE(input_size=args.input_size, num_components=args.embedding_size, sigmoid=sigmoid).to(device)
+    model = VAE(input_size=args.input_size, 
+            num_components=args.embedding_size, 
+            sigmoid=sigmoid,
+            hidden_layers=args.num_hidden_mayers,
+            ).to(device)
     optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
 
 
