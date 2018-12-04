@@ -65,7 +65,7 @@ if __name__=='__main__':
 		output_dir = Path(args.output_embeddings).parent.mkdir(parents=True, exist_ok=True)
 		writer = h5features.Writer(args.output_embeddings)
 
-		
+	print("Starting embedding with input size %s" % args.input_size)
 	model = VAE(input_size=args.input_size, num_components=args.embedding_size).to(device)
 	model.load_state_dict(torch.load(args.model_path))
 	model.eval()
