@@ -25,7 +25,7 @@ def bce_loss(recon_x, x, mu, logvar, input_size=40):
 
 def mse_loss(recon_x, x, mu, logvar, input_size=40):
     # Reconstruction + KL divergence losses summed over all elements and batch
-    MSE = F.mse_loss(recon_x, x.view(-1, input_size))
+    MSE = F.mse_loss(recon_x, x.view(-1, input_size), reduction="sum")
     # see Appendix B from VAE paper:
     # Kingma and Welling. Auto-Encoding Variational Bayes. ICLR, 2014
     # https://arxiv.org/abs/1312.6114
