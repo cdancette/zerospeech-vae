@@ -19,6 +19,10 @@ from data import get_train_test_datasets
 from pathlib import Path
 
 def bce_loss(recon_x, x, mu, logvar, input_size=40):
+    # see Appendix B from VAE paper:
+    # Kingma and Welling. Auto-Encoding Variational Bayes. ICLR, 2014
+    # https://arxiv.org/abs/1312.6114
+    # 0.5 * sum(1 + log(sigma^2) - mu^2 - sigma^2)
     BCE  = F.binary_cross_entropy(recon_x, x.view(-1, input_size), reduction='sum')
     KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
     return BCE + KLD
@@ -26,10 +30,7 @@ def bce_loss(recon_x, x, mu, logvar, input_size=40):
 def mse_loss(recon_x, x, mu, logvar, input_size=40):
     # Reconstruction + KL divergence losses summed over all elements and batch
     MSE = F.mse_loss(recon_x, x.view(-1, input_size), reduction="sum")
-    # see Appendix B from VAE paper:
-    # Kingma and Welling. Auto-Encoding Variational Bayes. ICLR, 2014
-    # https://arxiv.org/abs/1312.6114
-    # 0.5 * sum(1 + log(sigma^2) - mu^2 - sigma^2)
+
     KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
 
     return MSE + KLD
@@ -107,14 +108,16 @@ if __name__=='__main__':
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch_size, shuffle=True)
 
-    model = VAE(input_size=args.input_size, num_components=args.embedding_size).to(device)
-    optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
-
-
     if args.loss == "bce":
         loss_function = bce_loss
+        sigmoid = True
     elif args.loss == "mse":
         loss_function = mse_loss
+        sigmoid = False
+    
+    model = VAE(input_size=args.input_size, num_components=args.embedding_size, sigmoid=sigmoid).to(device)
+    optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
+
 
     for epoch in range(1, args.epochs + 1):
         train(epoch, args.input_size, loss_function=loss_function)

@@ -4,9 +4,10 @@ from torch.nn import functional as F
 
 
 class VAE(nn.Module):
-    def __init__(self, input_size, num_components):
+    def __init__(self, input_size, num_components, sigmoid=False):
         super(VAE, self).__init__()
 
+        self.sigmoid = sigmoid
         self.input_size = input_size
         self.num_components = num_components
 
@@ -27,8 +28,11 @@ class VAE(nn.Module):
 
     def decode(self, z):
         h3 = F.relu(self.fc3(z))
-        return self.fc4(h3)
-        #return torch.sigmoid(self.fc4(h3))
+
+        output = self.fc4(h3)
+        if self.sigmoid:
+            return torch.sigmoid(output)
+        return output
 
     def forward(self, x):
         mu, logvar = self.encode(x.view(-1, self.input_size))
