@@ -19,11 +19,11 @@ from data import get_train_test_datasets
 from pathlib import Path
 
 # Reconstruction + KL divergence losses summed over all elements and batch
-def loss_function(recon_x, x, mu, logvar):
-    #BCE = F.binary_cross_entropy(recon_x, x.view(-1, 40), reduction='sum')
+def loss_function(recon_x, x, mu, logvar, input_size=40):
+    #BCE = F.binary_cross_entropy(recon_x, x.view(-1, input_size), reduction='sum')
 
     # MSE norm
-    MSE = F.mse_loss(recon_x, x.view(-1, 40))
+    MSE = F.mse_loss(recon_x, x.view(-1, input_size))
     # see Appendix B from VAE paper:
     # Kingma and Welling. Auto-Encoding Variational Bayes. ICLR, 2014
     # https://arxiv.org/abs/1312.6114
@@ -84,9 +84,10 @@ if __name__=='__main__':
 	                    help='random seed (default: 1)')
 	parser.add_argument('--log-interval', type=int, default=1000, metavar='N',
 	                    help='how many batches to wait before logging training status')
-	parser.add_argument('--learning-rate', type=float, default=1e-4,
+        parser.add_argument('--learning-rate', type=float, default=1e-4,
 	                    help='learning rate')
 
+        parser.add_argument('--input-size', type=int, default=40)
 
 	args = parser.parse_args()
 	args.cuda = not args.no_cuda and torch.cuda.is_available()
@@ -105,7 +106,7 @@ if __name__=='__main__':
 	train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
 	test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch_size, shuffle=True)
 
-	model = VAE(input_size=40, num_components=args.embedding_size).to(device)
+	model = VAE(input_size=args.input_size, num_components=args.embedding_size).to(device)
 	optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
 	for epoch in range(1, args.epochs + 1):
 		train(epoch)
