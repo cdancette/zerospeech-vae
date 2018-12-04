@@ -79,7 +79,7 @@ if __name__=='__main__':
 			inputs = dict_features[file]
 			inputs = torch.FloatTensor(inputs)
 			inputs = inputs.to(device)
-			mu, logvar = model.encode(inputs.view(-1, 40))
+			mu, logvar = model.encode(inputs.view(-1, args.input_size))
 			z = model.reparameterize(mu, logvar).cpu().numpy()
 			if args.csv:	
 				with open(output_dir / '{file}.fea'.format(file=file), "w") as f:
