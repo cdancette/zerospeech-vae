@@ -82,10 +82,9 @@ if __name__=='__main__':
 	                    help='enables CUDA training')
 	parser.add_argument('--seed', type=int, default=1, metavar='S',
 	                    help='random seed (default: 1)')
-	parser.add_argument('--log-interval', type=int, default=1000, metavar='N',
+    parser.add_argument('--log-interval', type=int, default=1000, metavar='N',
 	                    help='how many batches to wait before logging training status')
     parser.add_argument('--learning-rate', type=float, default=1e-4, help='learning rate')
-
     parser.add_argument('--input-size', type=int, default=40)
 
 	args = parser.parse_args()
