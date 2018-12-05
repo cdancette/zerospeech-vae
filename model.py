@@ -62,7 +62,7 @@ class VAE(nn.Module):
 class OldVAE(nn.Module):
 
     def __init__(self, input_size, num_components, sigmoid=False):
-        super(VAE, self).__init__()
+        super(OldVAE, self).__init__()
 
         self.sigmoid = sigmoid
         self.input_size = input_size
