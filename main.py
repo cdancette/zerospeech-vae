@@ -14,7 +14,7 @@ import h5py
 import random
 import numpy as np
 
-from model import VAE
+from model import VAE, OldVAE
 from data import get_train_test_datasets
 from pathlib import Path
 

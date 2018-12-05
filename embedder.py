@@ -1,5 +1,5 @@
 import torch
-from model import VAE
+from model import VAE, OldVAE
 from data import get_dataset
 import h5features
 from pathlib import Path
@@ -43,6 +43,7 @@ if __name__=='__main__':
 	                    help='random seed (default: 1)')
 	parser.add_argument('--log-interval', type=int, default=10, metavar='N',
 	                    help='how many batches to wait before logging training status')
+	parser.add_argument("--old-model", action="store_true")
 	
 	args = parser.parse_args()
 	args.cuda = not args.no_cuda and torch.cuda.is_available()
@@ -66,7 +67,10 @@ if __name__=='__main__':
 		writer = h5features.Writer(args.output_embeddings)
 
 	print("Starting embedding with input size %s" % args.input_size)
-	model = VAE(input_size=args.input_size, num_components=args.embedding_size).to(device)
+	if args.old_model:
+		model = OldVAE(input_size=args.input_size, num_components=args.embedding_size).to(device)
+	else:	
+		model = VAE(input_size=args.input_size, num_components=args.embedding_size).to(device)
 	model.load_state_dict(torch.load(args.model_path))
 	model.eval()
 	with torch.no_grad():
