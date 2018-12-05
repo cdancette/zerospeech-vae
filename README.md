@@ -7,8 +7,8 @@ which is unsupervised subword modeling.
 
 
 
-# Training
+### Training
 Use main.py, or the train.sh wrapper
 
-# Embedding
+### Embedding
 Use embedding.py
