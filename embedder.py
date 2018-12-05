@@ -44,6 +44,7 @@ if __name__=='__main__':
 	parser.add_argument('--log-interval', type=int, default=10, metavar='N',
 	                    help='how many batches to wait before logging training status')
 	parser.add_argument("--old-model", action="store_true")
+	parser.add_argument("--num-hidden-layers", type=int, default=1)
 	
 	args = parser.parse_args()
 	args.cuda = not args.no_cuda and torch.cuda.is_available()
@@ -70,7 +71,7 @@ if __name__=='__main__':
 	if args.old_model:
 		model = OldVAE(input_size=args.input_size, num_components=args.embedding_size).to(device)
 	else:	
-		model = VAE(input_size=args.input_size, num_components=args.embedding_size).to(device)
+		model = VAE(input_size=args.input_size, num_components=args.embedding_size, hidden_layers=args.num_hidden_layers).to(device)
 	model.load_state_dict(torch.load(args.model_path))
 	model.eval()
 	with torch.no_grad():
